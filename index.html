@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexo — Produtividade & Saúde</title>
+    <style>
+        :root {
+            --bg: #08080f;
+            --surface: #111118;
+            --surface2: #1a1a25;
+            --surface3: #222230;
+            --card: rgba(18, 18, 28, 0.75);
+            --glass: rgba(22, 22, 38, 0.65);
+            --border: rgba(255, 255, 255, 0.06);
+            --border2: rgba(255, 255, 255, 0.10);
+            --text: #e8e8f0;
+            --text2: #b0b0c0;
+            --text3: #7a7a90;
+            --accent: #8b5cf6;
+            --accent2: #a78bfa;
+            --accent3: #c084fc;
+            --accent-glow: rgba(139, 92, 246, 0.25);
+            --neon: #c084fc;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --info: #60a5fa;
+            --radius-sm: 10px;
+            --radius: 16px;
+            --radius-lg: 22px;
+            --radius-xl: 28px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
+            --font: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            line-height: 1.5;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            user-select: none;
+            -webkit-user-select: none;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(192, 132, 252, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 70%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 10px; }
+
+        #app {
+            width: 100%;
+            max-width: 520px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: 80px;
+        }
+        .header {
+            padding: 16px 20px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(8, 8, 15, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent2), var(--neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-date {
+            font-size: 0.85rem;
+            color: var(--text3);
+            font-weight: 500;
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border2);
+            background: var(--surface2);
+            color: var(--text2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+        .icon-btn:hover,
+        .icon-btn:active {
+            background: var(--surface3);
+            color: var(--text);
+            border-color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+        .main-content {
+            flex: 1;
+            padding: 12px 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+            50% { box-shadow: 0 0 0 12px transparent; }
+        }
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.08); }
+            60% { transform: scale(0.96); }
+            100% { transform: scale(1); }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.2px;
+        }
+        .card-badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .badge-success { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+        .badge-warning { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+        .badge-accent { background: rgba(139, 92, 246, 0.2); color: var(--accent3); }
+        .badge-danger { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+
+        .progress-wrap { margin: 8px 0; }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text3);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .progress-label span:last-child { color: var(--text2); font-weight: 600; }
+        .progress-bar {
+            height: 8px;
+            border-radius: 10px;
+            background: var(--surface3);
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(90deg, var(--accent), var(--neon));
+        }
+        .progress-fill.success { background: linear-gradient(90deg, #34d399, #6ee7b7); }
+        .progress-fill.warning { background: linear-gradient(90deg, #fbbf24, #fcd34d); }
+        .progress-fill.info { background: linear-gradient(90deg, #60a5fa, #93c5fd); }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: var(--surface2);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            animation: slideUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        .task-item.visible { opacity: 1; }
+        .task-item:hover { border-color: var(--border2); background: var(--surface3); }
+        .task-item.completed { opacity: 0.55; }
+        .task-item.completed .task-title { text-decoration: line-through; color: var(--text3); }
+        
+        .task-btn-check {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--border2);
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .task-btn-check:hover {
+            border-color: var(--success);
+            background: rgba(52, 211, 153, 0.1);
+        }
+        .task-btn-check.done {
+            background: var(--success);
+            border-color: var(--success);
+            color: #fff;
+        }
+        .task-btn-fail {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--border2);
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .task-btn-fail:hover {
+            border-color: var(--danger);
+            background: rgba(248, 113, 113, 0.1);
+        }
+        .task-btn-fail.failed {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: #fff;
+        }
+        
+        .task-info { flex: 1; min-width: 0; cursor: pointer; }
+        .task-title { font-size: 0.9rem; font-weight: 500; color: var(--text); transition: var(--transition); }
+        .task-meta { font-size: 0.7rem; color: var(--text3); display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+        .task-priority { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .priority-high { background: var(--danger); box-shadow: 0 0 8px rgba(248, 113, 113, 0.5); }
+        .priority-medium { background: var(--warning); box-shadow: 0 0 8px rgba(251, 191, 36, 0.5); }
+        .priority-low { background: var(--info); box-shadow: 0 0 8px rgba(96, 165, 250, 0.5); }
+        
+        /* Botões minimalistas de editar/excluir - aparecem no hover */
+        .task-actions {
+            display: flex;
+            gap: 2px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            flex-shrink: 0;
+        }
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+        .task-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text3);
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .task-action-btn:hover {
+            background: var(--surface3);
+            color: var(--text);
+        }
+        .task-action-btn.edit-btn:hover {
+            color: var(--accent2);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        .task-action-btn.delete-btn:hover {
+            color: var(--danger);
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .food-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--surface2);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .food-item:hover { background: var(--surface3); border-color: var(--border2); }
+        .food-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .food-info { flex: 1; min-width: 0; }
+        .food-name { font-size: 0.85rem; font-weight: 500; }
+        .food-detail { font-size: 0.7rem; color: var(--text3); }
+
+        .category-section {
+            margin-bottom: 12px;
+        }
+        .category-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 6px 14px;
+            background: rgba(14, 14, 24, 0.9);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid var(--border);
+            z-index: 100;
+            gap: 2px;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            color: var(--text3);
+            font-size: 0.6rem;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            min-width: 50px;
+            position: relative;
+        }
+        .nav-item.active { color: var(--neon); }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            width: 20px;
+            height: 3px;
+            border-radius: 3px;
+            background: var(--accent);
+        }
+        .nav-icon { font-size: 1.2rem; transition: var(--transition); }
+        .nav-item:active { transform: scale(0.93); }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            width: 100%;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 20px 18px 28px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+        .modal h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+            text-align: center;
+        }
+        .form-group { margin-bottom: 12px; }
+        .form-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border2);
+            background: var(--surface2);
+            color: var(--text);
+            font-size: 0.9rem;
+            font-family: var(--font);
+            transition: var(--transition);
+            outline: none;
+        }
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .form-textarea { resize: vertical; min-height: 70px; }
+        .form-select { appearance: none; cursor: pointer; }
+        .btn {
+            padding: 11px 20px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            font-family: var(--font);
+            transition: var(--transition);
+            letter-spacing: -0.2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            width: 100%;
+        }
+        .btn-primary:hover { background: #7c3aed; box-shadow: 0 4px 20px var(--accent-glow); }
+        .btn-secondary { background: var(--surface3); color: var(--text); width: 100%; }
+        .btn-secondary:hover { background: var(--surface2); }
+        .btn-danger { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+        .btn-sm { padding: 6px 14px; font-size: 0.78rem; border-radius: 20px; }
+        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .search-wrap { position: relative; }
+        .search-wrap input { padding-left: 38px; }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text3);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+        .chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border2);
+            background: var(--surface2);
+            color: var(--text2);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .chip:hover { border-color: var(--accent); color: var(--text); }
+
+        .streak-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--warning);
+        }
+        .streak-fire { font-size: 1.8rem; animation: pulse 2s infinite; }
+
+        .water-glasses { display: flex; gap: 6px; flex-wrap: wrap; }
+        .water-glass {
+            width: 32px;
+            height: 40px;
+            border-radius: 6px 6px 10px 10px;
+            border: 2px solid var(--border2);
+            cursor: pointer;
+            transition: var(--transition);
+            background: transparent;
+            position: relative;
+        }
+        .water-glass.filled {
+            background: rgba(96, 165, 250, 0.5);
+            border-color: var(--info);
+            box-shadow: 0 0 12px rgba(96, 165, 250, 0.3);
+        }
+
+        .chart-container { position: relative; width: 100%; height: 200px; margin: 8px 0; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-card {
+            background: var(--surface2);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent2), var(--neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .empty-state { text-align: center; padding: 30px 20px; color: var(--text3); }
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.6; }
+        .empty-state p { font-size: 0.85rem; }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            animation: slideUp 0.3s ease;
+            pointer-events: none;
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            color: var(--text);
+            box-shadow: var(--shadow-lg);
+        }
+        .toast.success { border-color: var(--success); color: var(--success); }
+        .toast.error { border-color: var(--danger); color: var(--danger); }
+
+        .history-day {
+            background: var(--surface2);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+        }
+        .history-date {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .history-task {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 0.8rem;
+        }
+        .history-status {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 380px) {
+            .card { padding: 14px 15px; }
+            .task-item { padding: 10px; gap: 8px; }
+            .stat-grid { grid-template-columns: 1fr; }
+            .bottom-nav { padding: 6px 2px 10px; gap: 0; }
+            .nav-item { padding: 2px 4px; font-size: 0.55rem; min-width: 42px; }
+            .nav-icon { font-size: 1rem; }
+            .task-btn-check, .task-btn-fail { width: 28px; height: 28px; font-size: 14px; }
+        }
+        @media (min-width: 421px) {
+            .stat-grid { grid-template-columns: 1fr 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <span class="header-logo">nexo</span>
+            <span class="header-date" id="headerDate"></span>
+            <div class="header-actions">
+                <button class="icon-btn" id="btnRefresh" title="Atualizar">⟳</button>
+            </div>
+        </header>
+
+        <main class="main-content" id="mainContent"></main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="dashboard">
+                <span class="nav-icon">◈</span>Início
+            </button>
+            <button class="nav-item" data-tab="tasks">
+                <span class="nav-icon">☰</span>Tarefas
+            </button>
+            <button class="nav-item" data-tab="history">
+                <span class="nav-icon">📅</span>Histórico
+            </button>
+            <button class="nav-item" data-tab="nutrition">
+                <span class="nav-icon">🍎</span>Nutrição
+            </button>
+            <button class="nav-item" data-tab="stats">
+                <span class="nav-icon">📊</span>Stats
+            </button>
+            <button class="nav-item" data-tab="settings">
+                <span class="nav-icon">⚙</span>Ajustes
+            </button>
+        </nav>
+    </div>
+
+    <div id="modalContainer"></div>
+    <div id="toastContainer"></div>
+
+    <script>
+        (function() {
+            const STORAGE_KEY = 'nexo_data_v6';
+            const DAILY_SNAPSHOT_KEY = 'nexo_daily_snapshots_v6';
+            const HISTORY_KEY = 'nexo_task_history_v6';
+
+            function loadData() {
+                try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+                return getDefaultData();
+            }
+
+            function getDefaultData() {
+                return {
+                    tasks: [],
+                    foodLog: {},
+                    waterIntake: {},
+                    preferences: { waterGoal: 8, carbGoal: 200, calGoal: 2000, proteinGoal: 120 },
+                    streak: 0, lastCompletedDate: null, achievements: [], lastResetDate: null
+                };
+            }
+
+            function saveData(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {} }
+            function loadSnapshots() { try { const raw = localStorage.getItem(DAILY_SNAPSHOT_KEY); if (raw) return JSON.parse(raw); } catch (e) {} return {}; }
+            function saveSnapshots(s) { try { localStorage.setItem(DAILY_SNAPSHOT_KEY, JSON.stringify(s)); } catch (e) {} }
+            function loadHistory() { try { const raw = localStorage.getItem(HISTORY_KEY); if (raw) return JSON.parse(raw); } catch (e) {} return {}; }
+            function saveHistory(h) { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch (e) {} }
+
+            let appData = loadData();
+            let dailySnapshots = loadSnapshots();
+            let taskHistory = loadHistory();
+            let currentTab = 'dashboard';
+            let taskFilter = 'all';
+            let taskSearch = '';
+            let foodSearch = '';
+            let foodCategoryFilter = 'all';
+            let editingTaskId = null;
+            let reminderInterval = null;
+
+            const todayStr = () => new Date().toISOString().split('T')[0];
+            const now = () => new Date();
+
+            const foodCategories = {
+                'carnes': { icon: '🥩', label: 'Carnes, Ovos & Peixes', foods: [
+                    { name: 'Frango grelhado', icon: '🍗', serving: '100g', cal: 165, carbs: 0, protein: 31, fat: 3.6, fiber: 0, sugar: 0 },
+                    { name: 'Peito de frango cru', icon: '🍗', serving: '100g', cal: 120, carbs: 0, protein: 23, fat: 3, fiber: 0, sugar: 0 },
+                    { name: 'Carne moída (patinho)', icon: '🥩', serving: '100g', cal: 220, carbs: 0, protein: 26, fat: 12, fiber: 0, sugar: 0 },
+                    { name: 'Bife de alcatra', icon: '🥩', serving: '100g', cal: 180, carbs: 0, protein: 28, fat: 7, fiber: 0, sugar: 0 },
+                    { name: 'Picanha grelhada', icon: '🥩', serving: '100g', cal: 250, carbs: 0, protein: 24, fat: 17, fiber: 0, sugar: 0 },
+                    { name: 'Carne de porco (lombo)', icon: '🐷', serving: '100g', cal: 210, carbs: 0, protein: 27, fat: 11, fiber: 0, sugar: 0 },
+                    { name: 'Costela bovina', icon: '🍖', serving: '100g', cal: 320, carbs: 0, protein: 22, fat: 25, fiber: 0, sugar: 0 },
+                    { name: 'Peixe tilápia', icon: '🐟', serving: '100g', cal: 128, carbs: 0, protein: 26, fat: 3, fiber: 0, sugar: 0 },
+                    { name: 'Salmão grelhado', icon: '🐟', serving: '100g', cal: 206, carbs: 0, protein: 25, fat: 12, fiber: 0, sugar: 0 },
+                    { name: 'Atum enlatado', icon: '🐟', serving: '100g', cal: 130, carbs: 0, protein: 29, fat: 1, fiber: 0, sugar: 0 },
+                    { name: 'Camarão cozido', icon: '🦐', serving: '100g', cal: 99, carbs: 0, protein: 21, fat: 1, fiber: 0, sugar: 0 },
+                    { name: 'Ovo cozido', icon: '🥚', serving: '1 unidade', cal: 68, carbs: 0.6, protein: 5.5, fat: 4.8, fiber: 0, sugar: 0.6 },
+                    { name: 'Ovo frito', icon: '🍳', serving: '1 unidade', cal: 110, carbs: 1, protein: 6, fat: 9, fiber: 0, sugar: 0.5 },
+                    { name: 'Clara de ovo', icon: '🥚', serving: '1 unidade', cal: 17, carbs: 0.2, protein: 3.6, fat: 0, fiber: 0, sugar: 0 },
+                    { name: 'Peito de peru', icon: '🦃', serving: '50g', cal: 60, carbs: 1, protein: 10, fat: 1.5, fiber: 0, sugar: 0.5 },
+                    { name: 'Presunto magro', icon: '🥓', serving: '30g', cal: 45, carbs: 1, protein: 5, fat: 2.5, fiber: 0, sugar: 0.5 },
+                    { name: 'Bacon frito', icon: '🥓', serving: '30g', cal: 160, carbs: 0.5, protein: 7, fat: 14, fiber: 0, sugar: 0 },
+                    { name: 'Linguiça toscana', icon: '🌭', serving: '100g', cal: 300, carbs: 2, protein: 16, fat: 25, fiber: 0, sugar: 1 },
+                    { name: 'Salsicha', icon: '🌭', serving: '1 unidade', cal: 120, carbs: 2, protein: 5, fat: 10, fiber: 0, sugar: 1 },
+                    { name: 'Mortadela', icon: '🥪', serving: '30g', cal: 90, carbs: 1, protein: 3, fat: 8, fiber: 0, sugar: 0.5 }
+                ]},
+                'frutas': { icon: '🍎', label: 'Frutas', foods: [
+                    { name: 'Banana prata', icon: '🍌', serving: '1 unidade', cal: 89, carbs: 23, protein: 1.1, fat: 0.3, fiber: 2.6, sugar: 12 },
+                    { name: 'Maçã', icon: '🍎', serving: '1 unidade', cal: 52, carbs: 14, protein: 0.3, fat: 0.2, fiber: 2.4, sugar: 10 },
+                    { name: 'Laranja', icon: '🍊', serving: '1 unidade', cal: 47, carbs: 12, protein: 0.9, fat: 0.1, fiber: 2.4, sugar: 9 },
+                    { name: 'Uva', icon: '🍇', serving: '200g', cal: 138, carbs: 36, protein: 1.4, fat: 0.4, fiber: 1.8, sugar: 31 },
+                    { name: 'Abacate', icon: '🥑', serving: '100g', cal: 160, carbs: 9, protein: 2, fat: 15, fiber: 7, sugar: 0.7 },
+                    { name: 'Manga', icon: '🥭', serving: '1 unidade', cal: 135, carbs: 35, protein: 1, fat: 0.6, fiber: 3.7, sugar: 30 },
+                    { name: 'Abacaxi', icon: '🍍', serving: '200g', cal: 100, carbs: 26, protein: 1, fat: 0.2, fiber: 2.8, sugar: 20 },
+                    { name: 'Melancia', icon: '🍉', serving: '200g', cal: 60, carbs: 15, protein: 1.2, fat: 0.3, fiber: 0.8, sugar: 12 },
+                    { name: 'Morango', icon: '🍓', serving: '100g', cal: 32, carbs: 8, protein: 0.7, fat: 0.3, fiber: 2, sugar: 4.9 },
+                    { name: 'Kiwi', icon: '🥝', serving: '1 unidade', cal: 42, carbs: 10, protein: 0.8, fat: 0.4, fiber: 2.1, sugar: 6 }
+                ]},
+                'vegetais': { icon: '🥬', label: 'Vegetais & Legumes', foods: [
+                    { name: 'Alface', icon: '🥬', serving: '100g', cal: 15, carbs: 2.9, protein: 1.4, fat: 0.2, fiber: 1.3, sugar: 0.8 },
+                    { name: 'Brócolis cozido', icon: '🥦', serving: '100g', cal: 35, carbs: 7, protein: 2.4, fat: 0.4, fiber: 3.3, sugar: 1.4 },
+                    { name: 'Tomate', icon: '🍅', serving: '1 unidade', cal: 18, carbs: 3.9, protein: 0.9, fat: 0.2, fiber: 1.2, sugar: 2.6 },
+                    { name: 'Cenoura', icon: '🥕', serving: '100g', cal: 41, carbs: 10, protein: 0.9, fat: 0.2, fiber: 2.8, sugar: 4.7 },
+                    { name: 'Batata doce cozida', icon: '🍠', serving: '100g', cal: 86, carbs: 20, protein: 1.6, fat: 0.1, fiber: 3, sugar: 4 },
+                    { name: 'Mandioca cozida', icon: '🥔', serving: '100g', cal: 160, carbs: 38, protein: 1.4, fat: 0.3, fiber: 1.8, sugar: 1.7 }
+                ]},
+                'bebidas': { icon: '🥤', label: 'Bebidas', foods: [
+                    { name: 'Água', icon: '💧', serving: '200ml', cal: 0, carbs: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 },
+                    { name: 'Café preto', icon: '☕', serving: '200ml', cal: 2, carbs: 0, protein: 0.2, fat: 0, fiber: 0, sugar: 0 },
+                    { name: 'Leite integral', icon: '🥛', serving: '200ml', cal: 120, carbs: 9, protein: 6, fat: 6, fiber: 0, sugar: 9 },
+                    { name: 'Suco de laranja', icon: '🍊', serving: '200ml', cal: 90, carbs: 21, protein: 1.4, fat: 0.3, fiber: 0.4, sugar: 17 },
+                    { name: 'Refrigerante cola', icon: '🥤', serving: '350ml', cal: 149, carbs: 37, protein: 0, fat: 0, fiber: 0, sugar: 37 },
+                    { name: 'Cerveja', icon: '🍺', serving: '350ml', cal: 150, carbs: 13, protein: 1.5, fat: 0, fiber: 0, sugar: 0 }
+                ]},
+                'processados': { icon: '🍩', label: 'Processados & Snacks', foods: [
+                    { name: 'Salgadinho de milho', icon: '🍿', serving: '50g', cal: 250, carbs: 28, protein: 3, fat: 14, fiber: 1, sugar: 2 },
+                    { name: 'Batata frita (pacote)', icon: '🍟', serving: '50g', cal: 260, carbs: 25, protein: 3, fat: 17, fiber: 2, sugar: 1 },
+                    { name: 'Chocolate ao leite', icon: '🍫', serving: '30g', cal: 160, carbs: 18, protein: 2, fat: 9, fiber: 0.5, sugar: 16 },
+                    { name: 'Pizza (fatia mussarela)', icon: '🍕', serving: '1 fatia', cal: 285, carbs: 36, protein: 12, fat: 10, fiber: 1.5, sugar: 3 },
+                    { name: 'Hambúrguer', icon: '🍔', serving: '1 unidade', cal: 550, carbs: 42, protein: 25, fat: 30, fiber: 2, sugar: 8 },
+                    { name: 'Amendoim torrado', icon: '🥜', serving: '30g', cal: 170, carbs: 5, protein: 8, fat: 14, fiber: 2.5, sugar: 1 }
+                ]},
+                'graos': { icon: '🌾', label: 'Grãos, Cereais & Massas', foods: [
+                    { name: 'Arroz branco cozido', icon: '🍚', serving: '100g', cal: 130, carbs: 28, protein: 2.7, fat: 0.3, fiber: 0.4, sugar: 0.1 },
+                    { name: 'Arroz integral cozido', icon: '🍚', serving: '100g', cal: 124, carbs: 26, protein: 2.6, fat: 1, fiber: 2.7, sugar: 0.3 },
+                    { name: 'Feijão carioca cozido', icon: '🫘', serving: '100g', cal: 76, carbs: 14, protein: 4.8, fat: 0.5, fiber: 6, sugar: 0.3 },
+                    { name: 'Macarrão cozido', icon: '🍝', serving: '100g', cal: 131, carbs: 25, protein: 5, fat: 1.1, fiber: 1.2, sugar: 0.5 },
+                    { name: 'Pão francês', icon: '🥖', serving: '1 unidade', cal: 135, carbs: 26, protein: 4, fat: 1.5, fiber: 1.2, sugar: 1 },
+                    { name: 'Tapioca', icon: '🫓', serving: '100g', cal: 130, carbs: 28, protein: 0.2, fat: 0.4, fiber: 0, sugar: 0 },
+                    { name: 'Aveia em flocos', icon: '🥣', serving: '30g', cal: 110, carbs: 18, protein: 4, fat: 2, fiber: 3, sugar: 0.5 },
+                    { name: 'Granola', icon: '🥣', serving: '40g', cal: 160, carbs: 28, protein: 4, fat: 5, fiber: 3, sugar: 8 }
+                ]},
+                'laticinios': { icon: '🧀', label: 'Laticínios', foods: [
+                    { name: 'Queijo mussarela', icon: '🧀', serving: '30g', cal: 85, carbs: 1, protein: 6, fat: 6.5, fiber: 0, sugar: 0.3 },
+                    { name: 'Queijo minas', icon: '🧀', serving: '30g', cal: 70, carbs: 1, protein: 5, fat: 5, fiber: 0, sugar: 0.5 },
+                    { name: 'Manteiga', icon: '🧈', serving: '10g', cal: 72, carbs: 0, protein: 0, fat: 8, fiber: 0, sugar: 0 },
+                    { name: 'Iogurte natural', icon: '🍦', serving: '170g', cal: 100, carbs: 11, protein: 8, fat: 3, fiber: 0, sugar: 9 }
+                ]},
+                'oleos': { icon: '🫒', label: 'Óleos & Temperos', foods: [
+                    { name: 'Azeite de oliva', icon: '🫒', serving: '1 colher', cal: 119, carbs: 0, protein: 0, fat: 14, fiber: 0, sugar: 0 },
+                    { name: 'Maionese', icon: '🫙', serving: '1 colher', cal: 100, carbs: 1, protein: 0.2, fat: 11, fiber: 0, sugar: 0.5 },
+                    { name: 'Ketchup', icon: '🫙', serving: '1 colher', cal: 15, carbs: 4, protein: 0.2, fat: 0, fiber: 0, sugar: 3 },
+                    { name: 'Mel', icon: '🍯', serving: '1 colher', cal: 46, carbs: 12, protein: 0, fat: 0, fiber: 0, sugar: 12 },
+                    { name: 'Açúcar refinado', icon: '🍬', serving: '1 colher', cal: 39, carbs: 10, protein: 0, fat: 0, fiber: 0, sugar: 10 }
+                ]}
+            };
+
+            function getAllFoods() {
+                const all = [];
+                Object.keys(foodCategories).forEach(k => foodCategories[k].foods.forEach(f => all.push({...f, category: k})));
+                return all;
+            }
+
+            function checkAndResetDaily() {
+                const today = todayStr();
+                if (appData.lastResetDate === today) return;
+                if (appData.lastResetDate) saveDayHistory(appData.lastResetDate);
+                appData.tasks.forEach(t => {
+                    if (t.repeat === 'daily') { t.completed = false; t.completedDate = null; t.date = today; t.failed = false; }
+                    else if (t.repeat === 'weekly') {
+                        const td = new Date(t.date+'T00:00:00'), tdy = new Date(today+'T00:00:00');
+                        if (td.getDay() !== tdy.getDay()) { t.completed = false; t.completedDate = null; t.failed = false; }
+                        if (td.getDay() === tdy.getDay()) t.date = today;
+                    } else if (t.repeat === 'monthly') {
+                        const td = parseInt(t.date.split('-')[2]), tdy = parseInt(today.split('-')[2]);
+                        if (td !== tdy) { t.completed = false; t.completedDate = null; t.failed = false; }
+                        if (td === tdy) t.date = today;
+                    } else if (t.repeat === 'none' && t.date < today) { t.completed = false; t.completedDate = null; t.failed = false; }
+                });
+                const cf = {}; Object.keys(appData.foodLog).forEach(d => { if (d >= today) cf[d] = appData.foodLog[d]; }); appData.foodLog = cf;
+                const cw = {}; Object.keys(appData.waterIntake).forEach(d => { if (d >= today) cw[d] = appData.waterIntake[d]; }); appData.waterIntake = cw;
+                appData.lastResetDate = today; saveData(appData);
+            }
+
+            function saveDayHistory(date) {
+                if (!date) return;
+                const tasks = appData.tasks.filter(t => {
+                    if (t.repeat === 'daily') return true;
+                    if (t.repeat === 'weekly') return new Date(t.date+'T00:00:00').getDay() === new Date(date+'T00:00:00').getDay();
+                    if (t.repeat === 'monthly') return parseInt(t.date.split('-')[2]) === parseInt(date.split('-')[2]);
+                    return t.date === date;
+                });
+                const entry = tasks.map(t => ({ id: t.id, title: t.title, icon: t.icon||'📝', completed: t.completed&&t.completedDate===date, failed: t.failed&&t.failedDate===date, category: t.category||'', priority: t.priority||'low' }));
+                if (entry.length) { taskHistory[date] = entry; saveHistory(taskHistory); }
+            }
+
+            const mainContent = document.getElementById('mainContent');
+            const modalContainer = document.getElementById('modalContainer');
+            const toastContainer = document.getElementById('toastContainer');
+            const headerDate = document.getElementById('headerDate');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            function formatDate(d) { const dt = new Date(d+'T00:00:00'); const dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']; const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; return `${dias[dt.getDay()]}, ${dt.getDate()} de ${meses[dt.getMonth()]}`; }
+            function formatDateShort(d) { const dt = new Date(d+'T00:00:00'); return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`; }
+            function showToast(m, t) { const el = document.createElement('div'); el.className = `toast ${t}`; el.textContent = m; toastContainer.appendChild(el); setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 1800); }
+            function openModal(title, html, onSave) {
+                const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
+                overlay.innerHTML = `<div class="modal"><h3>${title}</h3><div class="modal-body">${html}</div><div class="btn-row" style="margin-top:16px;"><button class="btn btn-secondary cancel-btn">Cancelar</button><button class="btn btn-primary save-btn">Salvar</button></div></div>`;
+                modalContainer.appendChild(overlay);
+                const close = () => overlay.remove();
+                overlay.querySelector('.cancel-btn').addEventListener('click', close);
+                overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+                overlay.querySelector('.save-btn').addEventListener('click', () => { if (onSave) onSave(overlay, close); });
+            }
+            function confirmDialog(m, cb) {
+                const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
+                overlay.innerHTML = `<div class="modal" style="text-align:center;"><p style="margin-bottom:16px;">${m}</p><div class="btn-row"><button class="btn btn-secondary cancel-btn">Cancelar</button><button class="btn btn-danger confirm-btn">Confirmar</button></div></div>`;
+                modalContainer.appendChild(overlay);
+                const close = () => overlay.remove();
+                overlay.querySelector('.cancel-btn').addEventListener('click', close);
+                overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+                overlay.querySelector('.confirm-btn').addEventListener('click', () => { cb(); close(); });
+            }
+
+            function getTodayFoodLog() { return appData.foodLog[todayStr()] || []; }
+            function getTodayWater() { return appData.waterIntake[todayStr()] || 0; }
+            function getTodayTasks() {
+                const today = todayStr(); const map = new Map();
+                appData.tasks.forEach(t => {
+                    if (t.repeat === 'daily') { if (!map.has(t.id) || t.date === today) map.set(t.id, t); }
+                    else if (t.repeat === 'weekly') { if (new Date(t.date+'T00:00:00').getDay() === new Date(today+'T00:00:00').getDay()) map.set(t.id, t); }
+                    else if (t.repeat === 'monthly') { if (parseInt(t.date.split('-')[2]) === parseInt(today.split('-')[2])) map.set(t.id, t); }
+                    else if (t.repeat === 'none' && t.date === today) map.set(t.id, t);
+                });
+                return Array.from(map.values());
+            }
+
+            function updateStreak() {
+                const today = todayStr(); const c = getTodayTasks().filter(t => t.completed && t.completedDate === today).length;
+                const total = getTodayTasks().length;
+                if (total > 0 && c >= total && c > 0 && appData.lastCompletedDate !== today) {
+                    const y = new Date(); y.setDate(y.getDate()-1); const ys = y.toISOString().split('T')[0];
+                    appData.streak = appData.lastCompletedDate === ys ? appData.streak + 1 : 1;
+                    appData.lastCompletedDate = today; saveData(appData);
+                    if (appData.streak % 7 === 0) showToast(`🔥 ${appData.streak} dias de streak!`, 'success');
+                }
+            }
+
+            function saveDailySnapshot() {
+                const today = todayStr(); const fl = getTodayFoodLog();
+                dailySnapshots[today] = {
+                    tasksCompleted: getTodayTasks().filter(t => t.completed && t.completedDate === today).length,
+                    tasksTotal: getTodayTasks().length,
+                    carbs: Math.round(fl.reduce((s,f) => s+(f.carbs||0), 0)),
+                    cal: Math.round(fl.reduce((s,f) => s+(f.cal||0), 0)),
+                    protein: Math.round(fl.reduce((s,f) => s+(f.protein||0), 0)),
+                    water: getTodayWater(), streak: appData.streak
+                };
+                saveSnapshots(dailySnapshots);
+            }
+
+            function renderAll() {
+                checkAndResetDaily(); updateStreak(); saveDailySnapshot();
+                headerDate.textContent = formatDate(todayStr());
+                switch (currentTab) {
+                    case 'dashboard': renderDashboard(); break;
+                    case 'tasks': renderTasks(); break;
+                    case 'history': renderHistory(); break;
+                    case 'nutrition': renderNutrition(); break;
+                    case 'stats': renderStats(); break;
+                    case 'settings': renderSettings(); break;
+                }
+                updateNavActive();
+            }
+
+            function updateNavActive() { navItems.forEach(i => i.classList.toggle('active', i.dataset.tab === currentTab)); }
+
+            function renderDashboard() {
+                const today = todayStr(); const tasks = getTodayTasks();
+                const c = tasks.filter(t => t.completed && t.completedDate === today).length;
+                const f = tasks.filter(t => t.failed && t.failedDate === today).length;
+                const total = tasks.length; const pp = total ? Math.round(c/total*100) : 0;
+                const fl = getTodayFoodLog(); const tc = fl.reduce((s,fd) => s+(fd.carbs||0), 0);
+                const tcal = fl.reduce((s,fd) => s+(fd.cal||0), 0); const tp = fl.reduce((s,fd) => s+(fd.protein||0), 0);
+                const w = getTodayWater(); const wg = appData.preferences.waterGoal||8;
+                mainContent.innerHTML = `
+                <div class="card" style="text-align:center;padding:24px;"><div style="font-size:2.5rem;">${getGreetingEmoji()}</div><h2>${getGreeting()}</h2><p style="font-size:0.8rem;color:var(--text3);">${formatDate(today)}</p>${appData.streak>0?`<div class="streak-display" style="justify-content:center;margin-top:10px;"><span class="streak-fire">🔥</span> ${appData.streak} dia${appData.streak>1?'s':''}</div>`:''}</div>
+                <div class="card"><div class="card-header"><span class="card-title">📋 Tarefas</span><span class="card-badge ${pp>=80?'badge-success':'badge-warning'}">${pp}%</span></div><div class="progress-wrap"><div class="progress-label"><span>Concluídas</span><span>${c}/${total}</span></div><div class="progress-bar"><div class="progress-fill ${pp>=80?'success':''}" style="width:${pp}%;"></div></div></div><div style="font-size:0.78rem;color:var(--text3);">✅ ${c} · ❌ ${f} · ⏳ ${total-c-f}</div></div>
+                <div class="card"><div class="card-header"><span class="card-title">🍎 Nutrição</span></div><div class="progress-wrap"><div class="progress-label"><span>Calorias</span><span>${Math.round(tcal)}/${appData.preferences.calGoal||2000}</span></div><div class="progress-bar"><div class="progress-fill info" style="width:${Math.min(100,Math.round(tcal/(appData.preferences.calGoal||2000)*100))}%;"></div></div></div><div class="progress-wrap"><div class="progress-label"><span>Carboidratos</span><span>${Math.round(tc)}/${appData.preferences.carbGoal||200}g</span></div><div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100,Math.round(tc/(appData.preferences.carbGoal||200)*100))}%;"></div></div></div></div>
+                <div class="card"><div class="card-header"><span class="card-title">💧 Água</span><span>${w}/${wg}</span></div><div class="water-glasses">${Array.from({length:wg},(_,i)=>`<div class="water-glass ${i<w?'filled':''}" onclick="window.nexoActions.toggleWater(${i})"></div>`).join('')}</div></div>`;
+            }
+
+            function getGreeting() { const h = now().getHours(); return h<6?'Boa madrugada!':h<12?'Bom dia!':h<18?'Boa tarde!':'Boa noite!'; }
+            function getGreetingEmoji() { const h = now().getHours(); return h<6?'🌙':h<12?'☀️':h<18?'🌤️':'🌆'; }
+
+            function renderTasks() {
+                const today = todayStr(); let tasks = getTodayTasks();
+                if (taskFilter === 'completed') tasks = tasks.filter(t => t.completed && t.completedDate === today);
+                if (taskFilter === 'failed') tasks = tasks.filter(t => t.failed && t.failedDate === today);
+                if (taskFilter === 'pending') tasks = tasks.filter(t => !t.completed && !t.failed);
+                if (['high','medium','low'].includes(taskFilter)) tasks = tasks.filter(t => t.priority === taskFilter);
+                if (taskSearch) { const s = taskSearch.toLowerCase(); tasks = tasks.filter(t => t.title.toLowerCase().includes(s)); }
+                tasks.sort((a,b) => { const aD = (a.completed||a.failed)?1:0, bD = (b.completed||b.failed)?1:0; if (aD!==bD) return aD-bD; return {high:0,medium:1,low:2}[a.priority] - {high:0,medium:1,low:2}[b.priority]; });
+
+                mainContent.innerHTML = `
+                <div class="search-wrap"><span class="search-icon">🔍</span><input class="form-input" id="taskSearchInput" value="${escapeHTML(taskSearch)}" placeholder="Buscar tarefas..."></div>
+                <div class="filter-chips">
+                  <span class="chip ${taskFilter==='all'?'active':''}" data-filter="all">Todas</span>
+                  <span class="chip ${taskFilter==='pending'?'active':''}" data-filter="pending">Pendentes</span>
+                  <span class="chip ${taskFilter==='completed'?'active':''}" data-filter="completed">✅ Feitas</span>
+                  <span class="chip ${taskFilter==='failed'?'active':''}" data-filter="failed">❌ Não feitas</span>
+                  <span class="chip ${taskFilter==='high'?'active':''}" data-filter="high">Alta</span>
+                  <span class="chip ${taskFilter==='medium'?'active':''}" data-filter="medium">Média</span>
+                  <span class="chip ${taskFilter==='low'?'active':''}" data-filter="low">Baixa</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:0.75rem;color:var(--text3);">${tasks.length} tarefas</span><button class="btn btn-primary btn-sm" id="btnAddTask">+ Nova</button></div>
+                <div id="taskList">${tasks.length===0?`<div class="empty-state"><div class="empty-icon">📝</div><p>Nenhuma tarefa.</p></div>`:tasks.map(t=>`
+                <div class="task-item visible ${(t.completed||t.failed)?'completed':''}" data-id="${t.id}">
+                  <button class="task-btn-check ${t.completed?'done':''}" onclick="window.nexoActions.markDone('${t.id}')" title="Marcar como feito">✅</button>
+                  <button class="task-btn-fail ${t.failed?'failed':''}" onclick="window.nexoActions.markFailed('${t.id}')" title="Marcar como não feito">❌</button>
+                  <div class="task-info" onclick="window.nexoActions.editTask('${t.id}')">
+                    <span class="task-title">${escapeHTML(t.title)}</span>
+                    <div class="task-meta">${t.category?`<span>📁 ${escapeHTML(t.category)}</span>`:''}${t.repeat!=='none'?`<span>🔁 ${t.repeat}</span>`:''}</div>
+                  </div>
+                  <div class="task-priority priority-${t.priority}"></div>
+                  <div class="task-actions">
+                    <button class="task-action-btn edit-btn" onclick="window.nexoActions.editTask('${t.id}')" title="Editar">✎</button>
+                    <button class="task-action-btn delete-btn" onclick="window.nexoActions.deleteTask('${t.id}')" title="Excluir">✕</button>
+                  </div>
+                </div>`).join('')}</div>`;
+                document.getElementById('taskSearchInput')?.addEventListener('input', e => { taskSearch = e.target.value; renderTasks(); });
+                document.querySelectorAll('.filter-chips .chip').forEach(c => c.addEventListener('click', () => { taskFilter = c.dataset.filter; renderTasks(); }));
+                document.getElementById('btnAddTask')?.addEventListener('click', () => openTaskModal());
+            }
+
+            function openTaskModal(task=null) {
+                const isEdit = !!task; const t = task || { title:'', description:'', category:'', priority:'low', date:todayStr(), time:'', repeat:'daily', icon:'📝' };
+                openModal(isEdit?'Editar Tarefa':'Nova Tarefa', `
+                <div class="form-group"><label class="form-label">Título *</label><input class="form-input" id="taskTitle" value="${escapeHTML(t.title)}"></div>
+                <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" id="taskDesc">${escapeHTML(t.description||'')}</textarea></div>
+                <div class="form-group"><label class="form-label">Categoria</label><input class="form-input" id="taskCategory" value="${escapeHTML(t.category||'')}"></div>
+                <div class="btn-row"><div class="form-group" style="flex:1;"><label class="form-label">Prioridade</label><select class="form-select" id="taskPriority"><option value="low" ${t.priority==='low'?'selected':''}>🟢 Baixa</option><option value="medium" ${t.priority==='medium'?'selected':''}>🟡 Média</option><option value="high" ${t.priority==='high'?'selected':''}>🔴 Alta</option></select></div>
+                <div class="form-group" style="flex:1;"><label class="form-label">Repetir</label><select class="form-select" id="taskRepeat"><option value="none" ${t.repeat==='none'?'selected':''}>Sem repetir</option><option value="daily" ${t.repeat==='daily'?'selected':''}>Diário</option><option value="weekly" ${t.repeat==='weekly'?'selected':''}>Semanal</option><option value="monthly" ${t.repeat==='monthly'?'selected':''}>Mensal</option></select></div></div>
+                <div class="btn-row"><div class="form-group" style="flex:1;"><label class="form-label">Data</label><input class="form-input" type="date" id="taskDate" value="${t.date||todayStr()}"></div><div class="form-group" style="flex:1;"><label class="form-label">Horário</label><input class="form-input" type="time" id="taskTime" value="${t.time||''}"></div></div>
+                <div class="form-group"><label class="form-label">Ícone</label><input class="form-input" id="taskIcon" value="${t.icon||'📝'}"></div>`, (overlay, close) => {
+                    const title = overlay.querySelector('#taskTitle').value.trim();
+                    if (!title) { showToast('Título obrigatório', 'error'); return; }
+                    const data = { id: isEdit ? t.id : 'task_'+Date.now(), title, description: overlay.querySelector('#taskDesc').value.trim(), category: overlay.querySelector('#taskCategory').value.trim(), priority: overlay.querySelector('#taskPriority').value, date: overlay.querySelector('#taskDate').value, time: overlay.querySelector('#taskTime').value, repeat: overlay.querySelector('#taskRepeat').value, icon: overlay.querySelector('#taskIcon').value.trim()||'📝', completed: t.completed||false, completedDate: t.completedDate||null, failed: t.failed||false, failedDate: t.failedDate||null, createdAt: t.createdAt||Date.now() };
+                    if (isEdit) { const i = appData.tasks.findIndex(ta => ta.id === t.id); if (i >= 0) appData.tasks[i] = data; }
+                    else appData.tasks.push(data);
+                    saveData(appData); close(); renderAll(); showToast(isEdit?'Atualizado!':'Criado!', 'success');
+                });
+            }
+
+            function renderHistory() {
+                const dates = Object.keys(taskHistory).sort().reverse();
+                mainContent.innerHTML = `<div class="card"><div class="card-header"><span class="card-title">📅 Histórico</span><span class="card-badge badge-accent">${dates.length} dias</span></div></div>${dates.length===0?`<div class="empty-state"><div class="empty-icon">📅</div><p>Sem histórico.</p></div>`:dates.slice(0,14).map(d=>{const h=taskHistory[d];const c=h.filter(t=>t.completed).length;return`<div class="history-day"><div class="history-date">${formatDate(d)} <span style="font-size:0.7rem;color:var(--text3);">${c}/${h.length} ✅</span></div><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${c/h.length>=0.8?'success':''}" style="width:${Math.round(c/h.length*100)}%;"></div></div></div>${h.map(t=>`<div class="history-task"><span>${t.completed?'✅':t.failed?'❌':'⏳'}</span> ${t.icon} ${escapeHTML(t.title)}</div>`).join('')}</div>`;}).join('')}`;
+            }
+
+            function renderNutrition() {
+                const today = todayStr(); const fl = getTodayFoodLog();
+                const tc = fl.reduce((s,f) => s+(f.carbs||0), 0); const tcal = fl.reduce((s,f) => s+(f.cal||0), 0);
+                const tp = fl.reduce((s,f) => s+(f.protein||0), 0); const tf = fl.reduce((s,f) => s+(f.fat||0), 0);
+                mainContent.innerHTML = `
+                <div class="search-wrap"><span class="search-icon">🔍</span><input class="form-input" id="foodSearchInput" value="${escapeHTML(foodSearch)}" placeholder="Buscar alimento..."></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="font-size:0.75rem;color:var(--text3);">${fl.length} alimentos hoje</span><button class="btn btn-primary btn-sm" id="btnAddFood">+ Adicionar</button></div>
+                <div class="card"><div class="stat-grid"><div class="stat-card"><div class="stat-value">${Math.round(tcal)}</div><div class="stat-label">Calorias</div></div><div class="stat-card"><div class="stat-value">${Math.round(tc)}g</div><div class="stat-label">Carbos</div></div><div class="stat-card"><div class="stat-value">${Math.round(tp)}g</div><div class="stat-label">Proteínas</div></div><div class="stat-card"><div class="stat-value">${Math.round(tf)}g</div><div class="stat-label">Gorduras</div></div></div></div>
+                <div id="foodList">${fl.length===0?`<div class="empty-state"><div class="empty-icon">🍽️</div><p>Nenhum alimento hoje.</p></div>`:fl.map((f,i)=>`<div class="food-item"><span class="food-icon">${f.icon||'🍽️'}</span><div class="food-info"><div class="food-name">${escapeHTML(f.name)}</div><div class="food-detail">${f.qty} ${f.unit} · ${Math.round(f.carbs)}g carbs · ${Math.round(f.cal)} kcal</div></div><button class="task-action-btn delete-btn" onclick="window.nexoActions.removeFood(${i})">✕</button></div>`).join('')}</div>
+                <div class="card" style="margin-top:8px;"><div class="card-header"><span class="card-title">📚 Banco de Alimentos</span></div>
+                <div class="filter-chips"><span class="chip ${foodCategoryFilter==='all'?'active':''}" data-cat="all">Todos</span>${Object.keys(foodCategories).map(k=>`<span class="chip ${foodCategoryFilter===k?'active':''}" data-cat="${k}">${foodCategories[k].icon} ${foodCategories[k].label}</span>`).join('')}</div>
+                <div id="foodBank" style="max-height:400px;overflow-y:auto;"></div></div>`;
+                document.getElementById('foodSearchInput')?.addEventListener('input', e => { foodSearch = e.target.value; renderNutrition(); });
+                document.getElementById('btnAddFood')?.addEventListener('click', () => openFoodModal());
+                document.querySelectorAll('.filter-chips .chip').forEach(c => c.addEventListener('click', () => { foodCategoryFilter = c.dataset.cat; renderFoodBank(); }));
+                renderFoodBank();
+            }
+
+            function renderFoodBank() {
+                const bank = document.getElementById('foodBank'); if (!bank) return;
+                const s = foodSearch.toLowerCase(); let html = '';
+                Object.keys(foodCategories).forEach(k => {
+                    if (foodCategoryFilter !== 'all' && foodCategoryFilter !== k) return;
+                    const cat = foodCategories[k]; const filtered = cat.foods.filter(f => !s || f.name.toLowerCase().includes(s));
+                    if (!filtered.length) return;
+                    html += `<div class="category-section"><div class="category-title">${cat.icon} ${cat.label}</div>${filtered.map(f => `<div class="food-item" onclick="window.nexoActions.quickAddFood('${f.name}')"><span class="food-icon">${f.icon}</span><div class="food-info"><div class="food-name">${f.name}</div><div class="food-detail">${f.serving} · ${f.carbs}g carbs · ${f.cal} kcal</div></div><span style="color:var(--accent);">+</span></div>`).join('')}</div>`;
+                });
+                bank.innerHTML = html || '<p style="text-align:center;color:var(--text3);padding:20px;">Nenhum alimento.</p>';
+            }
+
+            function openFoodModal(preset=null) {
+                const all = getAllFoods();
+                openModal('Adicionar Alimento', `
+                <div class="form-group"><label class="form-label">Alimento</label><select class="form-select" id="foodSelect"><option value="">Selecione...</option>${Object.keys(foodCategories).map(k=>`<optgroup label="${foodCategories[k].label}">${foodCategories[k].foods.map(f=>`<option value="${f.name}" ${preset===f.name?'selected':''}>${f.icon} ${f.name}</option>`).join('')}</optgroup>`).join('')}<option value="custom">✏️ Personalizado</option></select></div>
+                <div id="customFoodFields" style="display:none;"><div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="customName"></div><div class="btn-row"><div class="form-group" style="flex:1;"><label class="form-label">Carbos (g)</label><input class="form-input" type="number" id="customCarbs" value="0" step="0.1"></div><div class="form-group" style="flex:1;"><label class="form-label">Calorias</label><input class="form-input" type="number" id="customCal" value="0"></div></div></div>
+                <div class="btn-row"><div class="form-group" style="flex:1;"><label class="form-label">Quantidade</label><input class="form-input" type="number" id="foodQty" value="1" step="0.1" min="0.1"></div><div class="form-group" style="flex:1;"><label class="form-label">Unidade</label><select class="form-select" id="foodUnit"><option value="porção">Porção</option><option value="g">Gramas (g)</option><option value="ml">Mililitros (ml)</option><option value="colher">Colher de sopa</option><option value="colher chá">Colher de chá</option><option value="xícara">Xícara</option><option value="fatia">Fatia</option><option value="unidade">Unidade</option></select></div></div>`, (overlay, close) => {
+                    const sel = overlay.querySelector('#foodSelect').value; const qty = parseFloat(overlay.querySelector('#foodQty').value)||1;
+                    const unit = overlay.querySelector('#foodUnit').value; let fd;
+                    if (sel === 'custom') fd = { name: overlay.querySelector('#customName').value.trim()||'Alimento', icon:'🍽️', carbs: parseFloat(overlay.querySelector('#customCarbs').value)||0, cal: parseFloat(overlay.querySelector('#customCal').value)||0, protein:0, fat:0, fiber:0, sugar:0 };
+                    else { fd = all.find(f => f.name === sel); if (!fd) { showToast('Selecione','error'); return; } }
+                    const entry = { name: fd.name, icon: fd.icon||'🍽️', qty, unit, carbs: (fd.carbs||0)*qty, cal: (fd.cal||0)*qty, protein: (fd.protein||0)*qty, fat: (fd.fat||0)*qty, fiber: (fd.fiber||0)*qty, sugar: (fd.sugar||0)*qty, time: now().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) };
+                    const today = todayStr(); if (!appData.foodLog[today]) appData.foodLog[today] = []; appData.foodLog[today].push(entry);
+                    saveData(appData); close(); renderAll(); showToast(`${entry.name} adicionado!`, 'success');
+                });
+                const selEl = modalContainer.querySelector('#foodSelect');
+                if (selEl) { selEl.addEventListener('change', () => { modalContainer.querySelector('#customFoodFields').style.display = selEl.value === 'custom' ? 'block' : 'none'; }); if (preset) selEl.value = preset; }
+            }
+
+            function renderStats() {
+                const snaps = dailySnapshots; const dates = Object.keys(snaps).sort(); const last7 = dates.slice(-7);
+                mainContent.innerHTML = `<div class="stat-grid"><div class="stat-card"><div class="stat-value">${last7.length?Math.round(last7.reduce((s,d)=>s+(snaps[d].tasksCompleted||0),0)/last7.length):0}</div><div class="stat-label">Média Tarefas</div></div><div class="stat-card"><div class="stat-value">${last7.length?Math.round(last7.reduce((s,d)=>s+(snaps[d].carbs||0),0)/last7.length):0}g</div><div class="stat-label">Média Carbos</div></div><div class="stat-card"><div class="stat-value">${last7.length?Math.round(last7.reduce((s,d)=>s+(snaps[d].cal||0),0)/last7.length):0}</div><div class="stat-label">Média Calorias</div></div><div class="stat-card"><div class="stat-value">🔥 ${dates.length?Math.max(...dates.map(d=>snaps[d].streak||0)):0}</div><div class="stat-label">Maior Streak</div></div></div>
+                <div class="card"><div class="card-header">📊 Carboidratos (7d)</div><div class="chart-container"><canvas id="chartCarbs"></canvas></div></div>
+                <div class="card"><div class="card-header">📋 Tarefas (7d)</div><div class="chart-container"><canvas id="chartTasks"></canvas></div></div>
+                <div class="card"><div class="card-header">💧 Água (7d)</div><div class="chart-container"><canvas id="chartWater"></canvas></div></div>`;
+                setTimeout(() => { drawBarChart('chartCarbs',last7,snaps,'carbs','g','#c084fc'); drawBarChart('chartTasks',last7,snaps,'tasksCompleted','','#34d399'); drawBarChart('chartWater',last7,snaps,'water','c','#60a5fa'); }, 100);
+            }
+
+            function drawBarChart(id, dates, snaps, key, suf, color) {
+                const c = document.getElementById(id); if (!c) return; const ctx = c.getContext('2d');
+                c.width = c.parentElement.offsetWidth; c.height = 200;
+                const vals = dates.map(d => snaps[d]?.[key]||0); const max = Math.max(...vals, 1);
+                const bw = Math.max(18, (c.width-40)/dates.length-8);
+                ctx.clearRect(0,0,c.width,c.height); ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                for (let i=0;i<4;i++) { const y=30+(c.height-50)*i/3; ctx.beginPath(); ctx.moveTo(20,y); ctx.lineTo(c.width-10,y); ctx.stroke(); }
+                dates.forEach((d,i) => { const v=vals[i]; const bh=Math.max(2,v/max*(c.height-60)); const x=20+i*((c.width-30)/dates.length); const y=c.height-25-bh;
+                    const g=ctx.createLinearGradient(x,y,x,c.height-25); g.addColorStop(0,color); g.addColorStop(1,'rgba(0,0,0,0.3)'); ctx.fillStyle=g;
+                    ctx.beginPath(); ctx.roundRect(x,y,bw,bh,[6,6,0,0]); ctx.fill();
+                    ctx.fillStyle='#e8e8f0'; ctx.font='10px Segoe UI'; ctx.textAlign='center'; ctx.fillText(v+suf,x+bw/2,y-4);
+                    ctx.fillStyle='#7a7a90'; ctx.fillText(formatDateShort(d),x+bw/2,c.height-8); });
+            }
+
+            function renderSettings() {
+                const p = appData.preferences;
+                mainContent.innerHTML = `<div class="card"><div class="card-header">⚙️ Metas</div><div class="form-group"><label class="form-label">Água (copos)</label><input class="form-input" type="number" id="prefWater" value="${p.waterGoal||8}"></div><div class="form-group"><label class="form-label">Carboidratos (g)</label><input class="form-input" type="number" id="prefCarbs" value="${p.carbGoal||200}"></div><div class="form-group"><label class="form-label">Calorias (kcal)</label><input class="form-input" type="number" id="prefCal" value="${p.calGoal||2000}"></div><div class="form-group"><label class="form-label">Proteínas (g)</label><input class="form-input" type="number" id="prefProtein" value="${p.proteinGoal||120}"></div><button class="btn btn-primary" id="btnSavePrefs">Salvar</button></div>
+                <div class="card" style="margin-top:12px;"><div class="card-header">🗃️ Dados</div><p style="font-size:0.8rem;color:var(--text3);">Armazenamento local.</p><div class="btn-row"><button class="btn btn-secondary" id="btnExport">📤 Exportar</button><button class="btn btn-danger" id="btnClear">🗑️ Limpar</button></div></div>`;
+                document.getElementById('btnSavePrefs')?.addEventListener('click', () => {
+                    appData.preferences.waterGoal = parseInt(document.getElementById('prefWater').value)||8;
+                    appData.preferences.carbGoal = parseInt(document.getElementById('prefCarbs').value)||200;
+                    appData.preferences.calGoal = parseInt(document.getElementById('prefCal').value)||2000;
+                    appData.preferences.proteinGoal = parseInt(document.getElementById('prefProtein').value)||120;
+                    saveData(appData); showToast('Salvo!','success');
+                });
+                document.getElementById('btnExport')?.addEventListener('click', () => {
+                    const blob = new Blob([JSON.stringify({appData,dailySnapshots,taskHistory},null,2)],{type:'application/json'});
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'nexo_backup_'+todayStr()+'.json'; a.click();
+                });
+                document.getElementById('btnClear')?.addEventListener('click', () => confirmDialog('Limpar TUDO?', () => {
+                    appData = getDefaultData(); dailySnapshots = {}; taskHistory = {};
+                    saveData(appData); saveSnapshots(dailySnapshots); saveHistory(taskHistory); renderAll(); showToast('Limpo!','success');
+                }));
+            }
+
+            window.nexoActions = {
+                markDone(id) { const t = appData.tasks.find(t=>t.id===id); if(!t)return; const today=todayStr(); if(t.completed&&t.completedDate===today){t.completed=false;t.completedDate=null;}else{t.completed=true;t.completedDate=today;t.failed=false;t.failedDate=null;} saveData(appData); saveDayHistory(today); renderAll(); },
+                markFailed(id) { const t = appData.tasks.find(t=>t.id===id); if(!t)return; const today=todayStr(); if(t.failed&&t.failedDate===today){t.failed=false;t.failedDate=null;}else{t.failed=true;t.failedDate=today;t.completed=false;t.completedDate=null;} saveData(appData); saveDayHistory(today); renderAll(); },
+                editTask(id) { const t = appData.tasks.find(t=>t.id===id); if(t) openTaskModal(t); },
+                deleteTask(id) { confirmDialog('Excluir esta tarefa?', () => { appData.tasks = appData.tasks.filter(t=>t.id!==id); saveData(appData); renderAll(); showToast('Excluído!','success'); }); },
+                toggleWater(i) { const today=todayStr(); const c=appData.waterIntake[today]||0; appData.waterIntake[today]=i<c?Math.max(0,i):i+1; saveData(appData); renderAll(); },
+                removeFood(i) { const today=todayStr(); if(appData.foodLog[today]){appData.foodLog[today].splice(i,1); saveData(appData); renderAll();} },
+                quickAddFood(n) { openFoodModal(n); },
+            };
+
+            navItems.forEach(i => i.addEventListener('click', () => { currentTab=i.dataset.tab; taskSearch=''; foodSearch=''; taskFilter='all'; foodCategoryFilter='all'; renderAll(); }));
+
+            function checkReminders() {
+                if (!('Notification' in window)) return;
+                const today=todayStr(); const ct=now().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',hour12:false});
+                getTodayTasks().forEach(t => { if(t.time&&t.time===ct&&!(t.completed&&t.completedDate===today)&&Notification.permission==='granted') new Notification('⏰ Nexo',{body:`Hora de: ${t.title}`,tag:t.id}); });
+            }
+
+            function requestNotificationPermission() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); }
+
+            function init() {
+                checkAndResetDaily(); renderAll(); requestNotificationPermission();
+                if (reminderInterval) clearInterval(reminderInterval); reminderInterval = setInterval(checkReminders, 30000);
+                setInterval(() => { if (appData.lastResetDate !== todayStr()) { checkAndResetDaily(); renderAll(); } }, 60000);
+                document.getElementById('btnRefresh')?.addEventListener('click', () => { appData=loadData(); dailySnapshots=loadSnapshots(); taskHistory=loadHistory(); checkAndResetDaily(); renderAll(); showToast('Atualizado!','success'); });
+                document.addEventListener('visibilitychange', () => { if (!document.hidden) { appData=loadData(); dailySnapshots=loadSnapshots(); taskHistory=loadHistory(); checkAndResetDaily(); renderAll(); } });
+                setInterval(() => { saveDailySnapshot(); saveDayHistory(todayStr()); }, 300000);
+            }
+
+            if (!CanvasRenderingContext2D.prototype.roundRect) { CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) { const rr=r[0]||0; this.beginPath(); this.moveTo(x+rr,y); this.lineTo(x+w-rr,y); this.quadraticCurveTo(x+w,y,x+w,y+rr); this.lineTo(x+w,y+h-rr); this.quadraticCurveTo(x+w,y+h,x+w-rr,y+h); this.lineTo(x+rr,y+h); this.quadraticCurveTo(x,y+h,x,y+h-rr); this.lineTo(x,y+rr); this.quadraticCurveTo(x,y,x+rr,y); this.closePath(); }; }
+            function escapeHTML(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
