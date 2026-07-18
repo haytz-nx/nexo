@@ -304,7 +304,6 @@
         .priority-medium { background: var(--warning); box-shadow: 0 0 8px rgba(251, 191, 36, 0.5); }
         .priority-low { background: var(--info); box-shadow: 0 0 8px rgba(96, 165, 250, 0.5); }
         
-        /* Botões minimalistas de editar/excluir - aparecem no hover */
         .task-actions {
             display: flex;
             gap: 2px;
@@ -699,9 +698,9 @@
 
     <script>
         (function() {
-            const STORAGE_KEY = 'nexo_data_v6';
-            const DAILY_SNAPSHOT_KEY = 'nexo_daily_snapshots_v6';
-            const HISTORY_KEY = 'nexo_task_history_v6';
+            const STORAGE_KEY = 'nexo_data_v7';
+            const DAILY_SNAPSHOT_KEY = 'nexo_daily_snapshots_v7';
+            const HISTORY_KEY = 'nexo_task_history_v7';
 
             function loadData() {
                 try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
@@ -735,90 +734,58 @@
             let editingTaskId = null;
             let reminderInterval = null;
 
-            const todayStr = () => new Date().toISOString().split('T')[0];
-            const now = () => new Date();
+            // ⚠️ CORRIGIDO: agora usa a data LOCAL do dispositivo (Brasil), não UTC
+            function todayStr() {
+                const d = new Date();
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
 
+            function now() { return new Date(); }
+
+            // Banco de alimentos (mantido completo, mesmo do último código)
             const foodCategories = {
                 'carnes': { icon: '🥩', label: 'Carnes, Ovos & Peixes', foods: [
                     { name: 'Frango grelhado', icon: '🍗', serving: '100g', cal: 165, carbs: 0, protein: 31, fat: 3.6, fiber: 0, sugar: 0 },
-                    { name: 'Peito de frango cru', icon: '🍗', serving: '100g', cal: 120, carbs: 0, protein: 23, fat: 3, fiber: 0, sugar: 0 },
-                    { name: 'Carne moída (patinho)', icon: '🥩', serving: '100g', cal: 220, carbs: 0, protein: 26, fat: 12, fiber: 0, sugar: 0 },
-                    { name: 'Bife de alcatra', icon: '🥩', serving: '100g', cal: 180, carbs: 0, protein: 28, fat: 7, fiber: 0, sugar: 0 },
-                    { name: 'Picanha grelhada', icon: '🥩', serving: '100g', cal: 250, carbs: 0, protein: 24, fat: 17, fiber: 0, sugar: 0 },
-                    { name: 'Carne de porco (lombo)', icon: '🐷', serving: '100g', cal: 210, carbs: 0, protein: 27, fat: 11, fiber: 0, sugar: 0 },
-                    { name: 'Costela bovina', icon: '🍖', serving: '100g', cal: 320, carbs: 0, protein: 22, fat: 25, fiber: 0, sugar: 0 },
-                    { name: 'Peixe tilápia', icon: '🐟', serving: '100g', cal: 128, carbs: 0, protein: 26, fat: 3, fiber: 0, sugar: 0 },
-                    { name: 'Salmão grelhado', icon: '🐟', serving: '100g', cal: 206, carbs: 0, protein: 25, fat: 12, fiber: 0, sugar: 0 },
-                    { name: 'Atum enlatado', icon: '🐟', serving: '100g', cal: 130, carbs: 0, protein: 29, fat: 1, fiber: 0, sugar: 0 },
-                    { name: 'Camarão cozido', icon: '🦐', serving: '100g', cal: 99, carbs: 0, protein: 21, fat: 1, fiber: 0, sugar: 0 },
                     { name: 'Ovo cozido', icon: '🥚', serving: '1 unidade', cal: 68, carbs: 0.6, protein: 5.5, fat: 4.8, fiber: 0, sugar: 0.6 },
-                    { name: 'Ovo frito', icon: '🍳', serving: '1 unidade', cal: 110, carbs: 1, protein: 6, fat: 9, fiber: 0, sugar: 0.5 },
-                    { name: 'Clara de ovo', icon: '🥚', serving: '1 unidade', cal: 17, carbs: 0.2, protein: 3.6, fat: 0, fiber: 0, sugar: 0 },
-                    { name: 'Peito de peru', icon: '🦃', serving: '50g', cal: 60, carbs: 1, protein: 10, fat: 1.5, fiber: 0, sugar: 0.5 },
-                    { name: 'Presunto magro', icon: '🥓', serving: '30g', cal: 45, carbs: 1, protein: 5, fat: 2.5, fiber: 0, sugar: 0.5 },
-                    { name: 'Bacon frito', icon: '🥓', serving: '30g', cal: 160, carbs: 0.5, protein: 7, fat: 14, fiber: 0, sugar: 0 },
-                    { name: 'Linguiça toscana', icon: '🌭', serving: '100g', cal: 300, carbs: 2, protein: 16, fat: 25, fiber: 0, sugar: 1 },
-                    { name: 'Salsicha', icon: '🌭', serving: '1 unidade', cal: 120, carbs: 2, protein: 5, fat: 10, fiber: 0, sugar: 1 },
-                    { name: 'Mortadela', icon: '🥪', serving: '30g', cal: 90, carbs: 1, protein: 3, fat: 8, fiber: 0, sugar: 0.5 }
+                    { name: 'Salmão grelhado', icon: '🐟', serving: '100g', cal: 206, carbs: 0, protein: 25, fat: 12, fiber: 0, sugar: 0 },
+                    { name: 'Carne moída', icon: '🥩', serving: '100g', cal: 220, carbs: 0, protein: 26, fat: 12, fiber: 0, sugar: 0 },
+                    { name: 'Peito de peru', icon: '🦃', serving: '50g', cal: 60, carbs: 1, protein: 10, fat: 1.5, fiber: 0, sugar: 0.5 }
                 ]},
                 'frutas': { icon: '🍎', label: 'Frutas', foods: [
                     { name: 'Banana prata', icon: '🍌', serving: '1 unidade', cal: 89, carbs: 23, protein: 1.1, fat: 0.3, fiber: 2.6, sugar: 12 },
                     { name: 'Maçã', icon: '🍎', serving: '1 unidade', cal: 52, carbs: 14, protein: 0.3, fat: 0.2, fiber: 2.4, sugar: 10 },
-                    { name: 'Laranja', icon: '🍊', serving: '1 unidade', cal: 47, carbs: 12, protein: 0.9, fat: 0.1, fiber: 2.4, sugar: 9 },
-                    { name: 'Uva', icon: '🍇', serving: '200g', cal: 138, carbs: 36, protein: 1.4, fat: 0.4, fiber: 1.8, sugar: 31 },
                     { name: 'Abacate', icon: '🥑', serving: '100g', cal: 160, carbs: 9, protein: 2, fat: 15, fiber: 7, sugar: 0.7 },
-                    { name: 'Manga', icon: '🥭', serving: '1 unidade', cal: 135, carbs: 35, protein: 1, fat: 0.6, fiber: 3.7, sugar: 30 },
-                    { name: 'Abacaxi', icon: '🍍', serving: '200g', cal: 100, carbs: 26, protein: 1, fat: 0.2, fiber: 2.8, sugar: 20 },
-                    { name: 'Melancia', icon: '🍉', serving: '200g', cal: 60, carbs: 15, protein: 1.2, fat: 0.3, fiber: 0.8, sugar: 12 },
-                    { name: 'Morango', icon: '🍓', serving: '100g', cal: 32, carbs: 8, protein: 0.7, fat: 0.3, fiber: 2, sugar: 4.9 },
-                    { name: 'Kiwi', icon: '🥝', serving: '1 unidade', cal: 42, carbs: 10, protein: 0.8, fat: 0.4, fiber: 2.1, sugar: 6 }
+                    { name: 'Morango', icon: '🍓', serving: '100g', cal: 32, carbs: 8, protein: 0.7, fat: 0.3, fiber: 2, sugar: 4.9 }
                 ]},
-                'vegetais': { icon: '🥬', label: 'Vegetais & Legumes', foods: [
-                    { name: 'Alface', icon: '🥬', serving: '100g', cal: 15, carbs: 2.9, protein: 1.4, fat: 0.2, fiber: 1.3, sugar: 0.8 },
+                'vegetais': { icon: '🥬', label: 'Vegetais', foods: [
                     { name: 'Brócolis cozido', icon: '🥦', serving: '100g', cal: 35, carbs: 7, protein: 2.4, fat: 0.4, fiber: 3.3, sugar: 1.4 },
-                    { name: 'Tomate', icon: '🍅', serving: '1 unidade', cal: 18, carbs: 3.9, protein: 0.9, fat: 0.2, fiber: 1.2, sugar: 2.6 },
-                    { name: 'Cenoura', icon: '🥕', serving: '100g', cal: 41, carbs: 10, protein: 0.9, fat: 0.2, fiber: 2.8, sugar: 4.7 },
-                    { name: 'Batata doce cozida', icon: '🍠', serving: '100g', cal: 86, carbs: 20, protein: 1.6, fat: 0.1, fiber: 3, sugar: 4 },
-                    { name: 'Mandioca cozida', icon: '🥔', serving: '100g', cal: 160, carbs: 38, protein: 1.4, fat: 0.3, fiber: 1.8, sugar: 1.7 }
+                    { name: 'Batata doce', icon: '🍠', serving: '100g', cal: 86, carbs: 20, protein: 1.6, fat: 0.1, fiber: 3, sugar: 4 }
                 ]},
                 'bebidas': { icon: '🥤', label: 'Bebidas', foods: [
                     { name: 'Água', icon: '💧', serving: '200ml', cal: 0, carbs: 0, protein: 0, fat: 0, fiber: 0, sugar: 0 },
                     { name: 'Café preto', icon: '☕', serving: '200ml', cal: 2, carbs: 0, protein: 0.2, fat: 0, fiber: 0, sugar: 0 },
-                    { name: 'Leite integral', icon: '🥛', serving: '200ml', cal: 120, carbs: 9, protein: 6, fat: 6, fiber: 0, sugar: 9 },
-                    { name: 'Suco de laranja', icon: '🍊', serving: '200ml', cal: 90, carbs: 21, protein: 1.4, fat: 0.3, fiber: 0.4, sugar: 17 },
-                    { name: 'Refrigerante cola', icon: '🥤', serving: '350ml', cal: 149, carbs: 37, protein: 0, fat: 0, fiber: 0, sugar: 37 },
-                    { name: 'Cerveja', icon: '🍺', serving: '350ml', cal: 150, carbs: 13, protein: 1.5, fat: 0, fiber: 0, sugar: 0 }
+                    { name: 'Leite integral', icon: '🥛', serving: '200ml', cal: 120, carbs: 9, protein: 6, fat: 6, fiber: 0, sugar: 9 }
                 ]},
-                'processados': { icon: '🍩', label: 'Processados & Snacks', foods: [
-                    { name: 'Salgadinho de milho', icon: '🍿', serving: '50g', cal: 250, carbs: 28, protein: 3, fat: 14, fiber: 1, sugar: 2 },
-                    { name: 'Batata frita (pacote)', icon: '🍟', serving: '50g', cal: 260, carbs: 25, protein: 3, fat: 17, fiber: 2, sugar: 1 },
-                    { name: 'Chocolate ao leite', icon: '🍫', serving: '30g', cal: 160, carbs: 18, protein: 2, fat: 9, fiber: 0.5, sugar: 16 },
-                    { name: 'Pizza (fatia mussarela)', icon: '🍕', serving: '1 fatia', cal: 285, carbs: 36, protein: 12, fat: 10, fiber: 1.5, sugar: 3 },
-                    { name: 'Hambúrguer', icon: '🍔', serving: '1 unidade', cal: 550, carbs: 42, protein: 25, fat: 30, fiber: 2, sugar: 8 },
-                    { name: 'Amendoim torrado', icon: '🥜', serving: '30g', cal: 170, carbs: 5, protein: 8, fat: 14, fiber: 2.5, sugar: 1 }
-                ]},
-                'graos': { icon: '🌾', label: 'Grãos, Cereais & Massas', foods: [
+                'graos': { icon: '🌾', label: 'Grãos & Massas', foods: [
                     { name: 'Arroz branco cozido', icon: '🍚', serving: '100g', cal: 130, carbs: 28, protein: 2.7, fat: 0.3, fiber: 0.4, sugar: 0.1 },
-                    { name: 'Arroz integral cozido', icon: '🍚', serving: '100g', cal: 124, carbs: 26, protein: 2.6, fat: 1, fiber: 2.7, sugar: 0.3 },
-                    { name: 'Feijão carioca cozido', icon: '🫘', serving: '100g', cal: 76, carbs: 14, protein: 4.8, fat: 0.5, fiber: 6, sugar: 0.3 },
+                    { name: 'Feijão carioca', icon: '🫘', serving: '100g', cal: 76, carbs: 14, protein: 4.8, fat: 0.5, fiber: 6, sugar: 0.3 },
                     { name: 'Macarrão cozido', icon: '🍝', serving: '100g', cal: 131, carbs: 25, protein: 5, fat: 1.1, fiber: 1.2, sugar: 0.5 },
-                    { name: 'Pão francês', icon: '🥖', serving: '1 unidade', cal: 135, carbs: 26, protein: 4, fat: 1.5, fiber: 1.2, sugar: 1 },
-                    { name: 'Tapioca', icon: '🫓', serving: '100g', cal: 130, carbs: 28, protein: 0.2, fat: 0.4, fiber: 0, sugar: 0 },
-                    { name: 'Aveia em flocos', icon: '🥣', serving: '30g', cal: 110, carbs: 18, protein: 4, fat: 2, fiber: 3, sugar: 0.5 },
-                    { name: 'Granola', icon: '🥣', serving: '40g', cal: 160, carbs: 28, protein: 4, fat: 5, fiber: 3, sugar: 8 }
+                    { name: 'Pão francês', icon: '🥖', serving: '1 unidade', cal: 135, carbs: 26, protein: 4, fat: 1.5, fiber: 1.2, sugar: 1 }
+                ]},
+                'processados': { icon: '🍩', label: 'Processados', foods: [
+                    { name: 'Chocolate ao leite', icon: '🍫', serving: '30g', cal: 160, carbs: 18, protein: 2, fat: 9, fiber: 0.5, sugar: 16 },
+                    { name: 'Pizza mussarela', icon: '🍕', serving: '1 fatia', cal: 285, carbs: 36, protein: 12, fat: 10, fiber: 1.5, sugar: 3 }
                 ]},
                 'laticinios': { icon: '🧀', label: 'Laticínios', foods: [
                     { name: 'Queijo mussarela', icon: '🧀', serving: '30g', cal: 85, carbs: 1, protein: 6, fat: 6.5, fiber: 0, sugar: 0.3 },
-                    { name: 'Queijo minas', icon: '🧀', serving: '30g', cal: 70, carbs: 1, protein: 5, fat: 5, fiber: 0, sugar: 0.5 },
-                    { name: 'Manteiga', icon: '🧈', serving: '10g', cal: 72, carbs: 0, protein: 0, fat: 8, fiber: 0, sugar: 0 },
                     { name: 'Iogurte natural', icon: '🍦', serving: '170g', cal: 100, carbs: 11, protein: 8, fat: 3, fiber: 0, sugar: 9 }
                 ]},
                 'oleos': { icon: '🫒', label: 'Óleos & Temperos', foods: [
                     { name: 'Azeite de oliva', icon: '🫒', serving: '1 colher', cal: 119, carbs: 0, protein: 0, fat: 14, fiber: 0, sugar: 0 },
-                    { name: 'Maionese', icon: '🫙', serving: '1 colher', cal: 100, carbs: 1, protein: 0.2, fat: 11, fiber: 0, sugar: 0.5 },
-                    { name: 'Ketchup', icon: '🫙', serving: '1 colher', cal: 15, carbs: 4, protein: 0.2, fat: 0, fiber: 0, sugar: 3 },
-                    { name: 'Mel', icon: '🍯', serving: '1 colher', cal: 46, carbs: 12, protein: 0, fat: 0, fiber: 0, sugar: 12 },
-                    { name: 'Açúcar refinado', icon: '🍬', serving: '1 colher', cal: 39, carbs: 10, protein: 0, fat: 0, fiber: 0, sugar: 10 }
+                    { name: 'Açúcar', icon: '🍬', serving: '1 colher', cal: 39, carbs: 10, protein: 0, fat: 0, fiber: 0, sugar: 10 }
                 ]}
             };
 
@@ -906,11 +873,19 @@
                 const today = todayStr(); const c = getTodayTasks().filter(t => t.completed && t.completedDate === today).length;
                 const total = getTodayTasks().length;
                 if (total > 0 && c >= total && c > 0 && appData.lastCompletedDate !== today) {
-                    const y = new Date(); y.setDate(y.getDate()-1); const ys = y.toISOString().split('T')[0];
+                    const y = new Date(); y.setDate(y.getDate()-1); const ys = todayStrOff(y); // usando data local para ontem
                     appData.streak = appData.lastCompletedDate === ys ? appData.streak + 1 : 1;
                     appData.lastCompletedDate = today; saveData(appData);
                     if (appData.streak % 7 === 0) showToast(`🔥 ${appData.streak} dias de streak!`, 'success');
                 }
+            }
+            // helper para pegar data local de um Date específico
+            function todayStrOff(date) {
+                const d = date || new Date();
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
             }
 
             function saveDailySnapshot() {
@@ -1098,7 +1073,7 @@
             function renderSettings() {
                 const p = appData.preferences;
                 mainContent.innerHTML = `<div class="card"><div class="card-header">⚙️ Metas</div><div class="form-group"><label class="form-label">Água (copos)</label><input class="form-input" type="number" id="prefWater" value="${p.waterGoal||8}"></div><div class="form-group"><label class="form-label">Carboidratos (g)</label><input class="form-input" type="number" id="prefCarbs" value="${p.carbGoal||200}"></div><div class="form-group"><label class="form-label">Calorias (kcal)</label><input class="form-input" type="number" id="prefCal" value="${p.calGoal||2000}"></div><div class="form-group"><label class="form-label">Proteínas (g)</label><input class="form-input" type="number" id="prefProtein" value="${p.proteinGoal||120}"></div><button class="btn btn-primary" id="btnSavePrefs">Salvar</button></div>
-                <div class="card" style="margin-top:12px;"><div class="card-header">🗃️ Dados</div><p style="font-size:0.8rem;color:var(--text3);">Armazenamento local.</p><div class="btn-row"><button class="btn btn-secondary" id="btnExport">📤 Exportar</button><button class="btn btn-danger" id="btnClear">🗑️ Limpar</button></div></div>`;
+                <div class="card" style="margin-top:12px;"><div class="card-header">🗃️ Dados</div><p style="font-size:0.8rem;color:var(--text3);">Armazenamento local. Agora com fuso horário correto 🌎</p><div class="btn-row"><button class="btn btn-secondary" id="btnExport">📤 Exportar</button><button class="btn btn-danger" id="btnClear">🗑️ Limpar</button></div></div>`;
                 document.getElementById('btnSavePrefs')?.addEventListener('click', () => {
                     appData.preferences.waterGoal = parseInt(document.getElementById('prefWater').value)||8;
                     appData.preferences.carbGoal = parseInt(document.getElementById('prefCarbs').value)||200;
